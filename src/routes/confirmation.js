@@ -23,24 +23,25 @@ export default function Root() {
     setLoading(true)
 
     fetch('http://localhost:3001/api/submit', {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(location.state)
+      body: JSON.stringify(location.state || {})
     }).then(response => {
       if (response.ok) {
         navigate('/success')
-      }
-      return Promise.reject(response)
-    }).catch(response => {
-      response.json().then(data => {
-        const errorMessage = data.error
-        // Since the server does supply a  useful error send it to the error screen
-        navigate('/error', {
-          state: { errorMessage },
+      } else { 
+        response.json().then(data => {
+          const errorMessage = data.error
+          // Since the server does supply a  useful error send it to the error screen
+          navigate('/error', {
+            state: { errorMessage },
+          })
         })
-      })
-
+      }
+    }).catch(() => {
+      navigate('/error')
     })
   }
 
